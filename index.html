@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Soni Transfer — IT Branch Inspection</title>
+<style>
+:root{--navy:#1B3A6B;--blue:#2E5FAC;--orange:#E8622A;--green:#1D7A4A;--green-bg:#EAF5EE;--red:#C00000;--red-bg:#FFF0F0;--amber:#B45309;--amber-bg:#FFFBEB;--gray:#F4F5F7;--border:#DDE2EA;--text:#111827;--muted:#6B7280;--white:#FFFFFF}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--gray);color:var(--text);min-height:100vh;padding-bottom:80px}
+.app-header{background:var(--navy);padding:16px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+.logo-title{font-size:17px;font-weight:700;color:#fff}
+.logo-sub{font-size:11px;color:#A8BFDF;margin-top:2px}
+.header-badge{margin-left:auto;background:var(--orange);color:#fff;font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px}
+.progress-wrap{background:var(--navy);padding:0 20px 14px}
+.progress-label{font-size:11px;color:#A8BFDF;margin-bottom:5px;display:flex;justify-content:space-between}
+.progress-track{background:rgba(255,255,255,0.15);border-radius:4px;height:5px}
+.progress-fill{background:var(--orange);border-radius:4px;height:5px;transition:width .4s}
+.tabs{display:flex;overflow-x:auto;background:#fff;border-bottom:2px solid var(--border);padding:0 12px;gap:2px}
+.tab{padding:11px 12px;font-size:11px;font-weight:500;color:var(--muted);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;flex-shrink:0}
+.tab.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
+.tab.done{color:var(--green)}
+.container{max-width:700px;margin:0 auto;padding:14px}
+.panel{display:none}.panel.active{display:block}
+.card{background:#fff;border-radius:10px;padding:18px;margin-bottom:14px;border:1px solid var(--border)}
+.card-title{font-size:14px;font-weight:600;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-title .icon{background:var(--navy);color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:11px;font-weight:500;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+.field input,.field select,.field textarea{width:100%;border:1.5px solid var(--border);border-radius:7px;padding:9px 12px;font-size:13px;color:var(--text);background:#fff;outline:none;transition:border-color .2s;font-family:inherit}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue)}
+.field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%236B7280' d='M5 7L0 2h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.field2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.section-hdr{background:var(--navy);padding:10px 14px;display:flex;align-items:center;gap:8px;border-radius:8px 8px 0 0;margin-bottom:0}
+.section-hdr .s-icon{font-size:15px}
+.section-hdr .s-title{font-size:12px;font-weight:600;color:#fff;flex:1}
+.section-hdr .s-count{font-size:11px;color:#A8BFDF}
+.check-list{background:#fff;border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;margin-bottom:12px;overflow:hidden}
+.check-item{padding:11px 14px;border-bottom:1px solid var(--border)}
+.check-item:last-child{border-bottom:none}
+.check-item:nth-child(even){background:var(--gray)}
+.check-text{font-size:12px;color:var(--text);line-height:1.5;margin-bottom:7px}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap}
+.cbtn{padding:5px 14px;border-radius:20px;border:1.5px solid var(--border);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;background:#fff;color:var(--muted);font-family:inherit}
+.cbtn.ok.sel{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+.cbtn.issue.sel{background:var(--red-bg);border-color:var(--red);color:var(--red)}
+.cbtn.na.sel{background:var(--amber-bg);border-color:var(--amber);color:var(--amber)}
+.issue-box{display:none;margin-top:8px}
+.issue-box textarea{width:100%;border:1.5px solid #FCA5A5;border-radius:6px;padding:7px 10px;font-size:11px;font-family:inherit;resize:vertical;min-height:55px;outline:none;background:var(--red-bg)}
+.score-big{font-size:52px;font-weight:700;text-align:center;line-height:1}
+.score-sub{font-size:12px;color:var(--muted);text-align:center;margin-top:4px}
+.score-bar-wrap{background:var(--border);border-radius:4px;height:8px;margin:12px 0 6px;overflow:hidden}
+.score-bar{height:8px;border-radius:4px;transition:width .5s}
+.rating-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.rbox{border-radius:8px;padding:10px;border:2px solid var(--border);cursor:pointer;transition:all .15s}
+.rbox.g{background:var(--green-bg)}.rbox.g.sel{border-color:var(--green)}
+.rbox.s{background:#EFF6FF}.rbox.s.sel{border-color:var(--blue)}
+.rbox.a{background:var(--amber-bg)}.rbox.a.sel{border-color:var(--amber)}
+.rbox.c{background:var(--red-bg)}.rbox.c.sel{border-color:var(--red)}
+.rbox .re{font-size:18px}.rbox .rt{font-size:11px;font-weight:600;margin-top:3px}.rbox .rd{font-size:10px;color:var(--muted)}
+.issues-wrap{background:#fff;border-radius:8px;border:1px solid var(--border);overflow:hidden;margin-bottom:12px}
+.issues-hdr{background:var(--orange);padding:10px 14px;font-size:12px;font-weight:600;color:#fff}
+.issue-row{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;gap:8px}
+.issue-row:last-child{border-bottom:none}
+.idot{width:7px;height:7px;background:var(--red);border-radius:50%;margin-top:4px;flex-shrink:0}
+.itext{font-size:12px;line-height:1.5}
+.no-issues{padding:20px;text-align:center;color:var(--green);font-size:12px;font-weight:500}
+.history-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:all .15s}
+.history-card:hover{border-color:var(--blue);background:#F0F5FF}
+.hc-top{display:flex;align-items:center;gap:8px}
+.hc-branch{font-size:13px;font-weight:600;color:var(--navy)}
+.hc-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;margin-left:auto}
+.hc-badge.g{background:var(--green-bg);color:var(--green)}
+.hc-badge.a{background:var(--amber-bg);color:var(--amber)}
+.hc-badge.c{background:var(--red-bg);color:var(--red)}
+.hc-badge.s{background:#EFF6FF;color:var(--blue)}
+.hc-meta{font-size:11px;color:var(--muted);margin-top:3px}
+.btn-primary{width:100%;background:var(--navy);color:#fff;border:none;border-radius:8px;padding:13px;font-size:14px;font-weight:600;cursor:pointer;margin-top:6px;font-family:inherit;transition:background .2s}
+.btn-primary:hover{background:var(--blue)}
+.btn-orange{width:100%;background:var(--orange);color:#fff;border:none;border-radius:8px;padding:13px;font-size:14px;font-weight:600;cursor:pointer;margin-top:6px;font-family:inherit}
+.btn-outline{width:100%;background:#fff;color:var(--navy);border:2px solid var(--navy);border-radius:8px;padding:12px;font-size:13px;font-weight:600;cursor:pointer;margin-top:6px;font-family:inherit}
+.btn-danger{width:100%;background:#fff;color:var(--red);border:2px solid var(--red);border-radius:8px;padding:12px;font-size:13px;font-weight:600;cursor:pointer;margin-top:6px;font-family:inherit}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);display:flex;padding:10px 16px;gap:10px;padding-bottom:max(10px,env(safe-area-inset-bottom));z-index:100}
+.bnav{flex:1;padding:11px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:inherit}
+.bnav.prev{background:var(--gray);color:var(--navy)}
+.bnav.next{background:var(--navy);color:#fff}
+.sig-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.sig-box{border:1.5px solid var(--border);border-radius:7px;padding:12px}
+.sig-lbl{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
+.sig-line{border-top:1.5px solid var(--border);margin:10px 0 5px}
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+@media(max-width:480px){.field2{grid-template-columns:1fr}.rating-grid{grid-template-columns:1fr 1fr}.sig-row{grid-template-columns:1fr}}
+@media print{.app-header,.progress-wrap,.tabs,.bottom-nav,.btn-primary,.btn-orange,.btn-outline,.btn-danger,.cbtn,.toast{display:none!important}.panel{display:block!important}body{background:#fff;padding:0}}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div><div class="logo-title">Soni Transfer</div><div class="logo-sub">IT Branch Inspection Tool</div></div>
+  <div class="header-badge">v2.0</div>
+</div>
+<div class="progress-wrap">
+  <div class="progress-label"><span id="prog-txt">Step 1 of 8</span><span id="prog-pct">0%</span></div>
+  <div class="progress-track"><div class="progress-fill" id="prog-bar" style="width:12%"></div></div>
+</div>
+<div class="tabs" id="tabs">
+  <div class="tab active" onclick="go(0)">Details</div>
+  <div class="tab" onclick="go(1)">Equipment</div>
+  <div class="tab" onclick="go(2)">Network</div>
+  <div class="tab" onclick="go(3)">Biometric</div>
+  <div class="tab" onclick="go(4)">Software</div>
+  <div class="tab" onclick="go(5)">Security</div>
+  <div class="tab" onclick="go(6)">Report</div>
+  <div class="tab" onclick="go(7)">History</div>
+</div>
+
+<div class="container">
+
+<!-- PANEL 0: DETAILS -->
+<div class="panel active" id="p0">
+<div class="card">
+  <div class="card-title"><span class="icon">1</span>Branch Information</div>
+  <div class="field"><label>Branch Name</label>
+    <select id="f-branch">
+      <option value="">— Select branch —</option>
+      <optgroup label="Soni Branches — Kombo">
+        <option>Soni Transfer H/O (Head Office — Kairaba)</option>
+        <option>Soni Bakoteh</option>
+        <option>Soni Tabokoto</option>
+        <option>Soni Turntable</option>
+        <option>Soni Westfield</option>
+        <option>Manjai Branch</option>
+        <option>Soni Latrikunda</option>
+        <option>Soni Dippa Kunda</option>
+        <option>Soni Busumbala</option>
+        <option>Soni Coastal Road Market</option>
+        <option>Soni Kunkujang</option>
+        <option>Soni Nema Junction</option>
+        <option>Soni Nice Building</option>
+        <option>Soni Nusrat Junction</option>
+        <option>Soni Nyakoi Junction</option>
+        <option>Soni Penyem</option>
+        <option>Soni Sanchaba Junction</option>
+        <option>Soni Serrekunda Cemetery</option>
+        <option>Soni Tipper Garage</option>
+        <option>Wellingara (Omar Nimaga)</option>
+        <option>Senegambia</option>
+        <option>Gunjur</option>
+        <option>Sukuta</option>
+        <option>UnityRemit Head Office (Safe)</option>
+      </optgroup>
+      <optgroup label="Soni Branches — Up Country">
+        <option>Soni Farafenni</option>
+        <option>Soni Basse 1</option>
+        <option>Soni Baniko</option>
+        <option>Soni Demba Kunda</option>
+        <option>Soni Kumbija</option>
+        <option>Soni Sotuma</option>
+        <option>Soni Gambisara</option>
+        <option>Diabugu Batapa</option>
+        <option>Unity Kulari</option>
+        <option>Unity Koina</option>
+        <option>Unity Suduwol</option>
+        <option>Unity Dingiri</option>
+        <option>Unity Darsilameh</option>
+        <option>Unity Bajaha Kunda</option>
+        <option>Allunhari</option>
+        <option>Alluhari 2</option>
+        <option>Baragi Kunda</option>
+        <option>Boro</option>
+        <option>Chamoi</option>
+        <option>Garawol</option>
+        <option>Jalambereh</option>
+        <option>Julangel</option>
+        <option>Keneba Village</option>
+        <option>Sabi</option>
+        <option>Suduwol 2</option>
+        <option>Soni Dingiri 2</option>
+        <option>Soni Baja Kunda 2</option>
+        <option>Madina Samako</option>
+        <option>Sare Bojo</option>
+        <option>Bansang</option>
+        <option>Bureng</option>
+        <option>bakadaji</option>
+        <option>Fassbajong</option>
+        <option>Ba Sillah Diabugu</option>
+        <option>Seikou Koina</option>
+        <option>Touray Gambisara</option>
+        <option>Kolley Kanteh Numuyel</option>
+      </optgroup>
+      <optgroup label="Franchise Branches">
+        <option>Babun Fatty</option>
+        <option>Bundung - Baja Kunda Finance</option>
+        <option>Mandinari</option>
+        <option>Brufut</option>
+        <option>Coastal Road 2</option>
+        <option>mandinari temporal vault</option>
+      </optgroup>
+      <optgroup label="Sub Agents">
+        <option>Easy Financial</option>
+        <option>Agib Bank</option>
+        <option>Wave</option>
+        <option>Fast Remit</option>
+        <option>Reliance Finance</option>
+        <option>Smart FX Bureau</option>
+        <option>Afia Financial</option>
+        <option>Afri Swap</option>
+        <option>Other Sub Agent</option>
+      </optgroup>
+      <option value="new">➕ New Branch (Not Listed)</option>
+    </select>
+  </div>
+  <div class="field" id="new-branch-field" style="display:none"><label>New Branch Name</label><input id="f-newbranch" type="text" placeholder="Enter new branch name"></div>
+  <div class="field"><label>Branch Region</label>
+    <select id="f-region">
+      <option>Kombo</option><option>Up Country</option><option>WCR</option><option>CRR</option><option>URR</option><option>Others</option>
+    </select>
+  </div>
+  <div class="field2">
+    <div class="field" style="margin:0"><label>Inspection Date</label><input id="f-date" type="date"></div>
+    <div class="field" style="margin:0"><label>Time</label><input id="f-time" type="time"></div>
+  </div>
+  <div class="field"><label>IT Officer</label><input id="f-officer" type="text" value="Alkali Jallow"></div>
+  <div class="field"><label>Branch Manager / Contact</label><input id="f-manager" type="text" placeholder="Name of branch manager or contact"></div>
+  <div class="field"><label>Inspection Type</label>
+    <select id="f-type">
+      <option>Routine Monthly</option><option>Follow-up Visit</option><option>Incident Response</option><option>First Visit</option><option>Spot Check</option>
+    </select>
+  </div>
+  <div class="field"><label>Previous Issues Resolved?</label>
+    <select id="f-prev">
+      <option>First Visit — No Previous Inspection</option><option>Yes — All Resolved</option><option>Partially Resolved</option><option>No — Still Pending</option>
+    </select>
+  </div>
+  <div class="field"><label>Number of Staff at Branch</label><input id="f-staff" type="number" placeholder="e.g. 5" min="1"></div>
+</div>
+</div>
+
+<!-- PANELS 1-5: CHECKLISTS (built by JS) -->
+<div class="panel" id="p1"></div>
+<div class="panel" id="p2"></div>
+<div class="panel" id="p3"></div>
+<div class="panel" id="p4"></div>
+<div class="panel" id="p5"></div>
+
+<!-- PANEL 6: REPORT -->
+<div class="panel" id="p6">
+  <div class="card" style="text-align:center">
+    <div class="score-big" id="sc-num" style="color:var(--navy)">—</div>
+    <div class="score-sub" id="sc-sub">Complete all sections to see score</div>
+    <div class="score-bar-wrap"><div class="score-bar" id="sc-bar" style="width:0%;background:var(--green)"></div></div>
+    <div style="font-size:11px;color:var(--muted)" id="sc-detail"></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="icon">★</span>Overall Rating</div>
+    <div class="rating-grid">
+      <div class="rbox g" id="rb-g" onclick="selRating('g')"><div class="re">✅</div><div class="rt" style="color:var(--green)">Good</div><div class="rd">No issues found</div></div>
+      <div class="rbox s" id="rb-s" onclick="selRating('s')"><div class="re">🟡</div><div class="rt" style="color:var(--blue)">Satisfactory</div><div class="rd">Minor issues only</div></div>
+      <div class="rbox a" id="rb-a" onclick="selRating('a')"><div class="re">⚠️</div><div class="rt" style="color:var(--amber)">Needs Attention</div><div class="rd">Follow-up required</div></div>
+      <div class="rbox c" id="rb-c" onclick="selRating('c')"><div class="re">🔴</div><div class="rt" style="color:var(--red)">Critical</div><div class="rd">Immediate action</div></div>
+    </div>
+    <div class="field"><label>Inspector Comments & Recommendations</label><textarea id="f-comments" rows="4" placeholder="Observations, recommendations, next steps..."></textarea></div>
+  </div>
+  <div class="issues-wrap">
+    <div class="issues-hdr">🔴 Issues Found During This Inspection</div>
+    <div id="issues-list"><div class="no-issues">✅ No issues recorded</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="icon">✍</span>Sign-Off</div>
+    <div class="sig-row">
+      <div class="sig-box"><div class="sig-lbl">IT Officer</div><div style="font-size:13px;font-weight:600" id="sig-off">Alkali Jallow</div><div style="font-size:11px;color:var(--muted)">IT Officer — Soni Transfer</div><div class="sig-line"></div><div style="font-size:10px;color:var(--muted)">Signature on printed copy</div></div>
+      <div class="sig-box"><div class="sig-lbl">Branch Manager</div><input class="field" style="margin:0;width:100%;border:1.5px solid var(--border);border-radius:6px;padding:7px;font-size:12px;font-family:inherit" id="sig-mgr" placeholder="Manager name"><div class="sig-line"></div><div style="font-size:10px;color:var(--muted)">Signature on printed copy</div></div>
+    </div>
+  </div>
+  <button class="btn-primary" onclick="saveInspection()">💾 Save Inspection</button>
+  <button class="btn-orange" onclick="exportCSV()">📊 Export to CSV</button>
+  <button class="btn-orange" onclick="exportJSON()">📁 Export to JSON</button>
+  <button class="btn-outline" onclick="window.print()">🖨️ Print Report</button>
+  <button class="btn-outline" onclick="resetForm()">🔄 New Inspection</button>
+</div>
+
+<!-- PANEL 7: HISTORY -->
+<div class="panel" id="p7">
+  <div class="card">
+    <div class="card-title"><span class="icon">📋</span>Inspection History</div>
+    <div id="hist-list"><div class="no-issues" style="color:var(--muted)">No saved inspections yet</div></div>
+  </div>
+  <button class="btn-orange" onclick="exportAllCSV()">📊 Export All Records to CSV</button>
+  <button class="btn-orange" onclick="exportAllJSON()">📁 Export All Records to JSON</button>
+  <button class="btn-danger" onclick="clearHistory()">🗑️ Clear All History</button>
+</div>
+
+</div><!-- container -->
+
+<div class="bottom-nav">
+  <button class="bnav prev" id="btn-p" onclick="prev()">← Back</button>
+  <button class="bnav next" id="btn-n" onclick="next()">Next →</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CL = [
+  null,
+  {icon:'💻',title:'Hardware & Equipment',items:['All computers / laptops are powered on and functioning correctly','Keyboards, mice, and monitors are in good working condition','iMTO terminal(s) are powered on and operational','iMTO terminal is connected to the network and processing transactions','Printer is functional and has sufficient paper and ink','All power cables and network cables are properly connected and undamaged','UPS / surge protector is present and functional','No unauthorised devices connected to computers (USB drives, external disks)','All equipment is clean and properly maintained']},
+  {icon:'🌐',title:'Network & Connectivity',items:['Internet connection is active and stable','WiFi router / network switch is powered on and functioning','Soni Admin Platform (adm.sonitransfer.com) is accessible','Microsoft 365 / Outlook is accessible from this branch','FX Dashboard is accessible from this branch','Network speed is adequate — no significant slowness reported by staff','Network cables are organised and not creating trip hazards']},
+  {icon:'👆',title:'Biometric Clock-In Device',items:['Biometric device is powered on and displaying correctly','Device time and date are accurate (GMT+0 Banjul time)','All active branch staff are enrolled on the device','Staff are successfully clocking in and out with fingerprints','Device is connected to the IT network (Online in iVMS-4200)','No enrolled users who have left the company remain on the device','Attendance report for the current month is accurate and up to date','Device scanner glass is clean and free from dirt or scratches']},
+  {icon:'⚙️',title:'Software & Systems',items:['Windows is up to date on all branch computers','Antivirus / Windows Defender is active and running','No unauthorised software installed on branch computers','Microsoft 365 apps are installed and functioning correctly','Soni Admin Platform login is working correctly for all branch staff','No critical error messages or system warnings visible','Browser is up to date (Chrome or Edge)']},
+  {icon:'🔒',title:'IT Security Compliance',items:['Computers lock automatically when left unattended (screen lock active)','Staff are not sharing passwords with each other','No passwords written on sticky notes or visible in the workspace','Staff log out of all systems at end of working day','No sensitive customer data visible on unattended screens','WiFi password is not shared with unauthorised persons','No ex-staff accounts still active on branch systems','Security cameras (if any) are operational and recording']}
+];
+
+const ANS={}, NOTES={};
+let cur=0, selRat='';
+
+function buildPanels(){
+  for(let s=1;s<=5;s++){
+    const c=CL[s];
+    let h='<div class="section-hdr"><span class="s-icon">'+c.icon+'</span><span class="s-title">'+c.title+'</span><span class="s-count" id="cnt-'+s+'">0/'+c.items.length+'</span></div><div class="check-list">';
+    c.items.forEach((item,i)=>{
+      const k=s+'-'+i;
+      h+='<div class="check-item"><div class="check-text">'+item+'</div><div class="btn-row"><button class="cbtn ok" onclick="setA(\''+k+'\',\'ok\',this)">✓ OK</button><button class="cbtn issue" onclick="setA(\''+k+'\',\'issue\',this)">✗ Issue</button><button class="cbtn na" onclick="setA(\''+k+'\',\'na\',this)">— N/A</button></div><div class="issue-box" id="ib-'+k+'"><textarea placeholder="Describe issue and action taken..." oninput="NOTES[\''+k+'\']=this.value"></textarea></div></div>';
+    });
+    h+='</div>';
+    document.getElementById('p'+s).innerHTML=h;
+  }
+}
+
+function setA(k,v,btn){
+  ANS[k]=v;
+  const row=btn.closest('.check-item');
+  row.querySelectorAll('.cbtn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  const ib=document.getElementById('ib-'+k);
+  ib.style.display=v==='issue'?'block':'none';
+  updateCounts(); updateProg();
+}
+
+function updateCounts(){
+  for(let s=1;s<=5;s++){
+    let d=0;
+    CL[s].items.forEach((_,i)=>{if(ANS[s+'-'+i])d++;});
+    const el=document.getElementById('cnt-'+s);
+    if(el)el.textContent=d+'/'+CL[s].items.length;
+  }
+}
+
+function updateProg(){
+  let tot=0,done=0;
+  for(let s=1;s<=5;s++){CL[s].items.forEach((_,i)=>{tot++;if(ANS[s+'-'+i])done++;});}
+  const pct=tot>0?Math.round(done/tot*100):0;
+  document.getElementById('prog-bar').style.width=(12+pct*0.88)+'%';
+  document.getElementById('prog-pct').textContent=pct+'%';
+}
+
+function go(idx){
+  document.querySelectorAll('.panel').forEach((p,i)=>p.classList.toggle('active',i===idx));
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
+  cur=idx;
+  const titles=['Branch Details','Equipment','Network','Biometric','Software','Security','Report','History'];
+  document.getElementById('prog-txt').textContent='Step '+(idx+1)+' of 8 — '+titles[idx];
+  document.getElementById('btn-p').style.opacity=idx===0?'0.3':'1';
+  document.getElementById('btn-n').textContent=idx===7?'✓':'Next →';
+  if(idx===6)buildReport();
+  if(idx===7)buildHistory();
+  // Show/hide new branch field
+  if(idx===0){
+    document.getElementById('f-branch').onchange=function(){
+      document.getElementById('new-branch-field').style.display=this.value==='new'?'block':'none';
+    };
+  }
+  window.scrollTo(0,0);
+}
+
+function next(){if(cur<7)go(cur+1);}
+function prev(){if(cur>0)go(cur-1);}
+
+function getBranchName(){
+  const sel=document.getElementById('f-branch').value;
+  if(sel==='new')return document.getElementById('f-newbranch').value||'New Branch';
+  return sel||'Unknown Branch';
+}
+
+function calcScore(){
+  let ok=0,issue=0,na=0,tot=0;
+  const issues=[];
+  for(let s=1;s<=5;s++){
+    CL[s].items.forEach((item,i)=>{
+      const k=s+'-'+i, v=ANS[k];
+      if(v){tot++;
+        if(v==='ok')ok++;
+        else if(v==='issue'){issue++;issues.push({section:CL[s].title,item,note:NOTES[k]||''});}
+        else if(v==='na')na++;
+      }
+    });
+  }
+  return{ok,issue,na,tot,issues,pct:tot>0?Math.round(ok/tot*100):0};
+}
+
+function buildReport(){
+  const {ok,issue,na,tot,issues,pct}=calcScore();
+  const sc=document.getElementById('sc-num');
+  sc.textContent=ok+'/'+tot;
+  sc.style.color=pct>=90?'var(--green)':pct>=70?'var(--amber)':'var(--red)';
+  document.getElementById('sc-sub').textContent=pct+'% pass rate';
+  document.getElementById('sc-detail').textContent=issue+' issue(s) · '+na+' N/A · '+tot+' checked';
+  const bar=document.getElementById('sc-bar');
+  bar.style.width=pct+'%';
+  bar.style.background=pct>=90?'#1D7A4A':pct>=70?'#B45309':'#C00000';
+  document.getElementById('sig-off').textContent=document.getElementById('f-officer').value||'Alkali Jallow';
+  const il=document.getElementById('issues-list');
+  if(issues.length===0){il.innerHTML='<div class="no-issues">✅ No issues recorded during this inspection</div>';}
+  else{il.innerHTML=issues.map(i=>'<div class="issue-row"><div class="idot"></div><div class="itext"><strong>'+i.section+':</strong> '+i.item+(i.note?'<br><span style="color:var(--red);font-size:11px">→ '+i.note+'</span>':'')+'</div></div>').join('');}
+}
+
+function selRating(v){
+  selRat=v;
+  ['g','s','a','c'].forEach(r=>document.getElementById('rb-'+r).classList.toggle('sel',r===v));
+}
+
+function getFormData(){
+  const {ok,issue,na,tot,issues,pct}=calcScore();
+  return{
+    id:'INS-'+Date.now(),
+    timestamp:new Date().toISOString(),
+    branch:getBranchName(),
+    region:document.getElementById('f-region').value,
+    date:document.getElementById('f-date').value,
+    time:document.getElementById('f-time').value,
+    officer:document.getElementById('f-officer').value,
+    manager:document.getElementById('f-manager').value,
+    inspType:document.getElementById('f-type').value,
+    prevResolved:document.getElementById('f-prev').value,
+    staffCount:document.getElementById('f-staff').value,
+    rating:selRat,
+    comments:document.getElementById('f-comments').value,
+    managerSig:document.getElementById('sig-mgr').value,
+    score:{ok,issue,na,tot,pct},
+    issues,
+    answers:{...ANS},
+    notes:{...NOTES}
+  };
+}
+
+function saveInspection(){
+  const data=getFormData();
+  if(!data.branch||data.branch==='— Select branch —'){showToast('⚠️ Please select a branch first');return;}
+  try{
+    const hist=JSON.parse(localStorage.getItem('soni-inspections')||'[]');
+    hist.unshift(data);
+    localStorage.setItem('soni-inspections',JSON.stringify(hist));
+    showToast('✅ Inspection saved successfully!');
+  }catch(e){showToast('⚠️ Could not save — storage may be full');}
+}
+
+function buildHistory(){
+  try{
+    const hist=JSON.parse(localStorage.getItem('soni-inspections')||'[]');
+    const el=document.getElementById('hist-list');
+    if(hist.length===0){el.innerHTML='<div class="no-issues" style="color:var(--muted)">No saved inspections yet. Complete and save an inspection first.</div>';return;}
+    el.innerHTML=hist.map((h,i)=>{
+      const rc={'g':'g','s':'s','a':'a','c':'c'}[h.rating]||'s';
+      const rl={'g':'✅ Good','s':'🟡 Satisfactory','a':'⚠️ Attention','c':'🔴 Critical'}[h.rating]||'—';
+      return'<div class="history-card" onclick="viewInspection('+i+')"><div class="hc-top"><div class="hc-branch">'+h.branch+'</div><div class="hc-badge '+rc+'">'+rl+'</div></div><div class="hc-meta">'+h.date+' · '+h.inspType+' · '+h.score.ok+'/'+h.score.tot+' checks ('+h.score.pct+'%) · '+h.score.issue+' issue(s)</div></div>';
+    }).join('');
+  }catch(e){document.getElementById('hist-list').innerHTML='<div class="no-issues" style="color:var(--muted)">Could not load history</div>';}
+}
+
+function viewInspection(i){
+  try{
+    const hist=JSON.parse(localStorage.getItem('soni-inspections')||'[]');
+    const h=hist[i];
+    alert('Branch: '+h.branch+'\nDate: '+h.date+'\nOfficer: '+h.officer+'\nScore: '+h.score.ok+'/'+h.score.tot+' ('+h.score.pct+'%)\nIssues: '+h.score.issue+'\nRating: '+h.rating+'\n\nComments: '+h.comments);
+  }catch(e){}
+}
+
+function exportCSV(){
+  const d=getFormData();
+  let csv='Field,Value\n';
+  csv+='Inspection ID,'+d.id+'\n';
+  csv+='Branch,'+d.branch+'\n';
+  csv+='Region,'+d.region+'\n';
+  csv+='Date,'+d.date+'\n';
+  csv+='Time,'+d.time+'\n';
+  csv+='IT Officer,'+d.officer+'\n';
+  csv+='Branch Manager,'+d.manager+'\n';
+  csv+='Inspection Type,'+d.inspType+'\n';
+  csv+='Staff Count,'+d.staffCount+'\n';
+  csv+='Score,'+d.score.ok+'/'+d.score.tot+'\n';
+  csv+='Pass Rate,'+d.score.pct+'%\n';
+  csv+='Issues Found,'+d.score.issue+'\n';
+  csv+='Overall Rating,'+d.rating+'\n';
+  csv+='Comments,"'+d.comments.replace(/"/g,'""')+'"\n\n';
+  csv+='ISSUES DETAIL\nSection,Item,Note\n';
+  d.issues.forEach(i=>{csv+=i.section+',"'+i.item.replace(/"/g,'""')+'","'+(i.note||'').replace(/"/g,'""')+'"\n';});
+  csv+='\nCHECKLIST ANSWERS\nSection,Item,Answer\n';
+  for(let s=1;s<=5;s++){CL[s].items.forEach((item,i)=>{const k=s+'-'+i;csv+=CL[s].title+',"'+item+'",'+( ANS[k]||'not answered')+'\n';});}
+  downloadFile('Soni_IT_Inspection_'+d.branch.replace(/[^a-zA-Z0-9]/g,'_')+'_'+d.date+'.csv',csv,'text/csv');
+  showToast('📊 CSV exported!');
+}
+
+function exportJSON(){
+  const d=getFormData();
+  downloadFile('Soni_IT_Inspection_'+d.branch.replace(/[^a-zA-Z0-9]/g,'_')+'_'+d.date+'.json',JSON.stringify(d,null,2),'application/json');
+  showToast('📁 JSON exported!');
+}
+
+function exportAllCSV(){
+  try{
+    const hist=JSON.parse(localStorage.getItem('soni-inspections')||'[]');
+    if(hist.length===0){showToast('No inspections to export');return;}
+    let csv='ID,Branch,Region,Date,Time,Officer,Manager,Type,Staff,Score,PassRate,Issues,Rating,Comments\n';
+    hist.forEach(h=>{csv+=h.id+','+h.branch+','+h.region+','+h.date+','+h.time+','+h.officer+','+h.manager+','+h.inspType+','+h.staffCount+','+h.score.ok+'/'+h.score.tot+','+h.score.pct+'%,'+h.score.issue+','+h.rating+',"'+(h.comments||'').replace(/"/g,'""')+'"\n';});
+    downloadFile('Soni_IT_All_Inspections_'+new Date().toISOString().split('T')[0]+'.csv',csv,'text/csv');
+    showToast('📊 All records exported!');
+  }catch(e){showToast('Error exporting');}
+}
+
+function exportAllJSON(){
+  try{
+    const hist=JSON.parse(localStorage.getItem('soni-inspections')||'[]');
+    downloadFile('Soni_IT_All_Inspections_'+new Date().toISOString().split('T')[0]+'.json',JSON.stringify(hist,null,2),'application/json');
+    showToast('📁 All records exported!');
+  }catch(e){showToast('Error exporting');}
+}
+
+function downloadFile(name,content,type){
+  const blob=new Blob([content],{type});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function clearHistory(){
+  if(!confirm('Delete ALL saved inspections? This cannot be undone.'))return;
+  localStorage.removeItem('soni-inspections');
+  buildHistory();
+  showToast('🗑️ History cleared');
+}
+
+function resetForm(){
+  if(!confirm('Start a new inspection? Unsaved data will be lost.'))return;
+  location.reload();
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// Init
+document.getElementById('f-date').valueAsDate=new Date();
+const n=new Date();
+document.getElementById('f-time').value=n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0');
+buildPanels();
+document.getElementById('f-branch').onchange=function(){
+  document.getElementById('new-branch-field').style.display=this.value==='new'?'block':'none';
+};
+</script>
+</body>
+</html>
